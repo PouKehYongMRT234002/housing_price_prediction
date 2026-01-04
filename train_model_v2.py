@@ -1,25 +1,41 @@
 import pandas as pd
-from sklearn.linear_model import LinearRegression
-from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder
 import joblib
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.linear_model import LinearRegression
 
+# Load dataset
 df = pd.read_csv("Housing.csv")
 
-X = df[["area", "bedrooms", "bathrooms", "stories", "mainroad", "guestroom", "basement", "hotwaterheating", "airconditioning", "parking", "prefarea", "furnishingstatus"]]
+# Define features
+num_features = ["area", "bedrooms", "bathrooms", "stories", "parking"]
+cat_features = [
+    "mainroad", "guestroom", "basement",
+    "hotwaterheating", "airconditioning",
+    "prefarea", "furnishingstatus"
+]
+
+X = df[num_features + cat_features]
 y = df["price"]
 
-preprocess = ColumnTransformer([
-    ("onehot", OneHotEncoder(handle_unknown="ignore"), ["area", "bedrooms", "bathrooms", "stories", "mainroad", "guestroom", "basement", "hotwaterheating", "airconditioning", "parking", "prefarea", "furnishingstatus"])
-], remainder="passthrough")
+# Preprocessing
+preprocess = ColumnTransformer(
+    transformers=[
+        ("cat", OneHotEncoder(handle_unknown="ignore"), cat_features),
+        ("num", "passthrough", num_features),
+    ]
+)
 
+# Pipeline
 model_v2 = Pipeline([
     ("preprocess", preprocess),
     ("regressor", LinearRegression())
 ])
 
+# Train
 model_v2.fit(X, y)
 
+# Save model
 joblib.dump(model_v2, "model_v2.pkl")
-print("Improved model saved.")
+print("Improved model v2 saved correctly.")
