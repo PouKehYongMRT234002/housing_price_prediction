@@ -1,5 +1,5 @@
 #•	v1 — Baseline Model
-# Uses 1 column field only: area → price
+# Uses 1 column only: area → price
 
 import pandas as pd
 from sklearn.linear_model import LinearRegression
